@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="ldapContextSource" class="org.springframework.ldap.core.support.LdapContextSource"
+        p:url      = "#{ldap.url}"
+        p:userDn   = "cn=#{ldap.username},#{ldap.baseName}"
+        p:password = "#{ldap.password}"
+        p:pooled   = "true"
+    />
+
+    <bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate"
+        c:contextSource-ref            = "ldapContextSource"
+        p:ignorePartialResultException = "true"
+    />
+
+    <bean id="ldapSpringLoginModule" class="au.net.apollosoft.refdata.commons.ldap.LdapLoginModule"
+        c:ldapTemplate-ref = "ldapTemplate" />
+
+</beans>

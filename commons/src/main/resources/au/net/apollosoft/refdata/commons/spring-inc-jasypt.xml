@@ -1,0 +1,21 @@
+<!--
+    http://www.jasypt.org/spring31.html
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:encryption="http://www.jasypt.org/schema/encryption"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+           http://www.jasypt.org/schema/encryption http://www.jasypt.org/schema/encryption/jasypt-spring31-encryption-1.xsd">
+
+    <bean id="jasypt.config" class="org.jasypt.encryption.pbe.config.EnvironmentStringPBEConfig"
+        p:algorithm="PBEWithMD5AndDES"
+        p:password="#{systemProperties['ENCRYPTION_PASSWORD'] ?: 'jasypt'}" />
+    <bean id="jasypt.stringEncryptor" class="org.jasypt.encryption.pbe.StandardPBEStringEncryptor"
+        p:config-ref="jasypt.config" />
+
+</beans>

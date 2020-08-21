@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- ========================= COMMON ========================= -->
+    <util:constant id="TRUE"  static-field="java.lang.Boolean.TRUE" />
+    <util:constant id="FALSE" static-field="java.lang.Boolean.FALSE" />
+
+    <!-- ========================= JASYPT ========================= -->
+    <import resource="classpath:au/net/apollosoft/refdata/commons/spring-inc-jasypt.xml" />
+
+    <!-- ========================= JMS ========================= -->
+    <import resource="classpath:au/net/apollosoft/refdata/commons/spring-inc-jms.xml" />
+
+    <!-- ========================= CAMEL ========================= -->
+    <import resource="classpath:au/net/apollosoft/refdata/refdata/consumer/spring-inc-camel.xml" />
+
+    <!-- ========================= DAO ========================= -->
+    <bean id="consumerDao" class="au.net.apollosoft.refdata.refdata.consumer.dao.impl.ConsumerDaoImpl" />
+
+    <!-- ========================= SERVICE ========================= -->
+    <bean id="consumerService" class="au.net.apollosoft.refdata.refdata.consumer.impl.ConsumerServiceImpl" />
+
+    <!-- ========================= JAXB ========================= -->
+    <bean id="unmarshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller"
+        p:checkForXmlRootElement="true">
+        <property name="classesToBeBound">
+            <list>
+                <value>au.net.apollosoft.v1.CanonMessage</value>
+                <value>au.net.apollosoft.refdata.v1.Content</value>
+            </list>
+        </property>
+        <property name="unmarshallerProperties">
+            <map>
+                <!--entry key-ref="IS_NAMESPACE_AWARE" value-ref="FALSE" /-->
+            </map>
+        </property>
+    </bean>
+
+</beans>

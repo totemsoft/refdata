@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:camel="http://camel.apache.org/schema/spring"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <!-- Enable bridge between Camel Property Placeholder and Spring Property placeholder
+         so we can use system properties to dynamically set the address for example. -->
+    <bean id="bridgePropertyPlaceholder" class="org.apache.camel.spring.spi.BridgePropertyPlaceholderConfigurer" />
+
+    <camelContext id="refdataConsumerCamelContext" xmlns="http://camel.apache.org/schema/spring" depends-on="jms">
+        <!-- Creates Consumer-Template bean -->
+        <consumerTemplate id="refdataConsumerTemplate" />
+
+        <endpoint id="refdata_queue" uri="#{solaceConfig['queue']}" />
+
+        <route id="refdata_consume" startupOrder="1" trace="false">
+            <from ref="refdata_queue" />
+            <!--transacted ref="requried" /-->
+            <log loggingLevel="DEBUG" message="Received message for route refdata_consume: ${body}" />
+            <transform>
+                <xpath>/*[name()='message']/*[name()='payload']/*[name()='content']</xpath>
+                <!--xpath>/message/payload/content</xpath-->
+            </transform>
+            <log loggingLevel="DEBUG" message="Transformed message for route refdata_consume: ${body}" />
+            <unmarshal>
+                <jaxb prettyPrint="false" contextPath="au.net.apollosoft.refdata.v1" />
+            </unmarshal>
+            <to uri="bean:consumerService?method=consume" pattern="InOnly" />
+        </route>
+    </camelContext>
+</beans>

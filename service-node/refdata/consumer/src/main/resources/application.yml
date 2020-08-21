@@ -1,0 +1,75 @@
+# https://docs.spring.io/spring-boot/docs/2.1.6.RELEASE/reference/html/common-application-properties.html
+
+# LOGGING
+logging:
+  file: ${logging_file:logs/service.log}
+  #config: classpath:log4j.xml
+  level:
+    root: ${logging_level:INFO}
+    com: WARN
+    net: WARN
+    org: WARN
+    au.net.apollosoft.refdata: ${logging_level:INFO}
+    #au.net.apollosoft.refdata.refdata.consumer.impl.ConsumerServiceImpl: ${logging_level:DEBUG}
+    #refdata_consume: ${logging_level:DEBUG}
+
+# ----------------------------------------
+# SECURITY PROPERTIES (SecurityProperties) Spring-Boot 2+
+# ----------------------------------------
+security:
+#  basic:
+#    enabled: true
+#    path: '/**'
+#  ignored: 
+#    - '/health/**'
+#  sessions: 'stateless'
+  user:
+    name: ${rest_username:user}
+    password: ${rest_password:password}
+
+# IDENTITY (ContextIdApplicationContextInitializer)
+spring:
+  application:
+    name: RefData Consumer Service
+
+# DATASOURCE - primary (DataSourceAutoConfiguration & DataSourceProperties)
+  datasource:
+    driver-class-name: ${datasource_driver}
+    url: ${datasource_url}
+    username: ${datasource_username}
+    password: ${datasource_password}
+    # Fully qualified name of the connection pool implementation to use. By default, it is auto-detected from the classpath.
+    #type: com.zaxxer.hikari.HikariDataSource
+    type: org.apache.tomcat.jdbc.pool.DataSource
+    #hikari:
+    tomcat:
+      initial-size: 1
+      max-active: 32
+      max-idle: 4
+      min-idle: 1
+      max-wait: 30000
+      time-between-eviction-runs-millis: 5000
+      min-evictable-idle-time-millis: 60000
+      #schema: 
+      name: dataSource
+      #jndi-name: jdbc/RefData_Consumer_DataSource
+      test-on-connect: true
+      test-on-borrow: true
+      test-on-return: true
+      test-while-idle: true
+      validation-query: select 1
+      connection-test-query: select 1
+
+  # APPLICATION SETTINGS (SpringApplication)
+  # Run the application in a web environment (auto-detected by default).
+  main:
+    allow-bean-definition-overriding: true
+    web-environment: true
+
+# EMBEDDED SERVER CONFIGURATION (ServerProperties)
+server:
+  #address: localhost
+  port: ${server_port:8080}
+  servlet:
+    context-path: /
+  display-name: RefData Consumer Service

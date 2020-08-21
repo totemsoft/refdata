@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://apollosoft.net.au/v1" targetNamespace="http://apollosoft.net.au/v1" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="message">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="header">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="metadata" type="MetadataType"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="payload" type="PayloadType"/>
+				<xs:element name="auditRecords" type="AuditRecordListType" nillable="false" minOccurs="1"/>
+				<xs:element name="ancillaryData" nillable="true" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>additional data to add. can be any xml data
+					</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:any namespace="##any" processContents="lax" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="trailer" nillable="true" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:sequence>
+								<xs:element name="checksum" type="ChecksumType" nillable="true" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Checksum of the "header" and "payload" elements in hexadecimal form. Note that a checksum should be included by default. If you are a canon message producing system and you cannot produce a checksum, you must seek a dispensation from the Canon WG.
+					</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="authentication" type="AuthenticationType" nillable="true" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>signed hash of meta data and "payload message"  
+					</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="MetadataType">
+		<xs:sequence>
+			<xs:element name="domain" type="DomainType" nillable="false"/>
+			<xs:element name="identifier" type="IdentifierType" nillable="false">
+				<xs:annotation>
+					<xs:documentation>identifier describes the data object identifier  
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="source" type="xs:string" nillable="false">
+				<xs:annotation>
+					<xs:documentation>The source of the canon message
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="messageId" type="MessageIdType" nillable="false">
+				<xs:annotation>
+					<xs:documentation> Unique message ID of (max) size 36 characters. Note that the messageId must be unique for the given source and domain. Preference using a GUID where possible.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="isDelete" type="xs:boolean" default="false" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> If set to true, the message will flag that canon object is deleted. If  set to false (or non-existant), the message is considered to represent the current state of the canon object.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IdentifierType">
+		<xs:sequence>
+			<xs:element name="id" type="IdType" nillable="false">
+				<xs:annotation>
+					<xs:documentation>id for the canon object (e.g. trade id)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="version" type="xs:string" nillable="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The version of the canon object (e.g. 1, 2, 3)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DomainType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" nillable="false">
+				<xs:annotation>
+					<xs:documentation>The name of the domain (e.g. counterparty, trade etc.)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="schemaVersion" type="xs:string" nillable="false">
+				<xs:annotation>
+					<xs:documentation>The version of the schema used in the payload (e.g. 1-0, 5-5)
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="subdomain" type="SubdomainType" nillable="true" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The (optional) subdomain
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SubdomainType">
+		<xs:sequence>
+			<xs:element name="name" type="xs:string" nillable="false"/>
+			<xs:element name="subdomain" type="SubdomainType" nillable="true" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The (optional) subdomain
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PayloadType" mixed="true">
+		<xs:complexContent mixed="true">
+			<xs:extension base="xs:anyType"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="AuditRecordListType">
+		<xs:sequence>
+			<xs:element name="sourceAuditRecord" type="SourceAuditRecordType" nillable="true" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="auditRecord" type="AuditRecordType" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SourceAuditRecordType">
+		<xs:sequence>
+			<xs:element name="system" type="xs:string" nillable="true" minOccurs="1">
+				<!-- must have the system name -->
+			</xs:element>
+			<xs:element name="user" type="xs:string" nillable="true" minOccurs="0"/>
+			<xs:element name="genericUser" type="xs:string" nillable="true" minOccurs="0"/>
+			<xs:element name="timestamp" type="SourceAuditRecordTimestamp" nillable="false" minOccurs="1">
+				<!-- must have at least one timestamp element -->
+			</xs:element>
+			<xs:element name="comment" type="xs:string" nillable="true" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SourceAuditRecordTimestamp">
+		<xs:choice>
+			<xs:sequence>
+				<xs:element name="created" type="xs:dateTime" nillable="false" minOccurs="1"/>
+				<xs:element name="updated" type="xs:dateTime" nillable="true" minOccurs="0"/>
+				<xs:element name="received" type="xs:dateTime" nillable="true" minOccurs="0"/>
+				<xs:element name="sent" type="xs:dateTime" nillable="true" minOccurs="0"/>
+			</xs:sequence>
+			<xs:sequence>
+				<xs:element name="updated" type="xs:dateTime" nillable="false" minOccurs="1"/>
+				<xs:element name="received" type="xs:dateTime" nillable="true" minOccurs="0"/>
+				<xs:element name="sent" type="xs:dateTime" nillable="true" minOccurs="0"/>
+			</xs:sequence>
+			<xs:sequence>
+				<xs:element name="received" type="xs:dateTime" nillable="false" minOccurs="1"/>
+				<xs:element name="sent" type="xs:dateTime" nillable="true" minOccurs="0"/>
+			</xs:sequence>
+			<xs:element name="sent" type="xs:dateTime" nillable="false" minOccurs="1"/>
+		</xs:choice>
+		<!-- source audit record needs to have at least one timestamp. I know it's an ugly definition, but no other way to describe it -->
+	</xs:complexType>
+	<xs:complexType name="AuditRecordType">
+		<xs:sequence>
+			<xs:element name="system" type="xs:string" nillable="true" minOccurs="0"/>
+			<xs:element name="user" type="xs:string" nillable="true" minOccurs="0"/>
+			<xs:element name="genericUser" type="xs:string" nillable="true" minOccurs="0"/>
+			<xs:element name="timestamp" type="AuditRecordTimestamp" nillable="true" minOccurs="0"/>
+			<xs:element name="comment" type="xs:string" nillable="true" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AuditRecordTimestamp">
+		<xs:sequence>
+			<xs:element name="created" type="xs:dateTime" nillable="true" minOccurs="0"/>
+			<xs:element name="updated" type="xs:dateTime" nillable="true" minOccurs="0"/>
+			<xs:element name="received" type="xs:dateTime" nillable="true" minOccurs="0"/>
+			<xs:element name="sent" type="xs:dateTime" nillable="true" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IdType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="idScheme" type="xs:string" use="required">
+					<xs:annotation>
+						<xs:documentation>type (scheme) of the id (e.g. fidessa-asia/executionId, uti, usi)</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="MessageIdType">
+		<xs:annotation>
+			<xs:documentation>
+                The representation of a message id
+            </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="36"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="ChecksumType">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="type" use="required">
+					<xs:annotation>
+						<xs:documentation>Can be one of the following:
+					md5sum
+					sha-1
+					sha-256
+					sha-384
+					sha-512
+					</xs:documentation>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="md5sum"/>
+							<xs:enumeration value="sha-1"/>
+							<xs:enumeration value="sha-256"/>
+							<xs:enumeration value="sha-384"/>
+							<xs:enumeration value="sha-512"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="AuthenticationType">
+		<xs:attribute name="type" type="xs:string" use="required"/>
+	</xs:complexType>
+</xs:schema>

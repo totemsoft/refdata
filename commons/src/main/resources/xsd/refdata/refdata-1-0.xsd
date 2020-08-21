@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://apollosoft.net.au/refdata/v1" targetNamespace="http://apollosoft.net.au/refdata/v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="v1">
+    <xsd:element name="content">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="refdata" type="RefDataType"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:complexType name="RefDataType">
+        <xsd:sequence>
+            <xsd:element name="data" type="CsvType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="key" type="xsd:string" use="required"/>
+        <xsd:attribute name="table" type="xsd:string" use="required"/>
+        <xsd:attribute name="primaryKey" type="xsd:string" use="required"/>
+        <xsd:attribute name="columns" type="xsd:string"/>
+        <xsd:attribute name="criteria" type="xsd:string"/>
+        <xsd:attribute name="profile" type="xsd:string"/>
+    </xsd:complexType>
+    <xsd:complexType name="CsvType">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="type" type="xsd:string"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+</xsd:schema>

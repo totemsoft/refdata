@@ -1,0 +1,15 @@
+#
+# https://docs.spring.io/spring-boot/docs/current/reference/html/howto-properties-and-configuration.html
+#
+spring:
+  profiles: profile1
+refdata:
+  solace:
+    topic: 'jms:topic:refdata_topic?jmsMessageType=Text&timeToLive=86400000'
+  producer:
+  - key: 'employee'
+    cron: '0 0 6 * * ?'
+    #cron: '0 0 6 * * MON-FRI'
+    table: 'common_employee'
+    primaryKey: 'id'
+    criteria: 'updated_date >= ? and updated_date < ?'

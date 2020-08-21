@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="jms" class="org.apache.camel.component.jms.JmsComponent"
+        p:connectionFactory-ref="jmsConnectionFactory"
+        p:maxConcurrentConsumers="4" />
+    <bean id="jmsConnectionFactory" class="com.solacesystems.jms.SolConnectionFactoryImpl"
+        c:properties-ref="jmsProperties"
+        p:SSLTrustStoreFormat="jks"
+        p:xmlPayload="true"
+    />
+    <bean id="jmsConnectionFactoryCached" class="org.springframework.jms.connection.CachingConnectionFactory"
+        p:targetConnectionFactory-ref = "jmsConnectionFactory"
+        p:sessionCacheSize            = "10"
+    />
+    <bean id="jmsConnectionFactory.propertyConfigurer" class="org.jasypt.spring31.properties.EncryptablePropertyOverrideConfigurer"
+        c:stringEncryptor-ref="jasypt.stringEncryptor">
+        <property name="properties">
+            <props>
+                <prop key="jmsConnectionFactory.host">#{systemProperties['solace_host']}</prop>
+                <prop key="jmsConnectionFactory.port">#{systemProperties['solace_port'] ?: 55443}</prop>
+                <prop key="jmsConnectionFactory.VPN">#{systemProperties['solace_VPN']}</prop>
+                <prop key="jmsConnectionFactory.username">#{systemProperties['solace_username']}</prop>
+                <prop key="jmsConnectionFactory.password">#{systemProperties['solace_password']}</prop>
+                <prop key="jmsConnectionFactory.SSLTrustStore">#{systemProperties['ssl_trustStore']}</prop>
+                <prop key="jmsConnectionFactory.SSLTrustStorePassword">#{systemProperties['ssl_trustStorePassword'] ?: 'changeit'}</prop>
+            </props>
+        </property>
+    </bean>
+    <bean id="jmsProperties" class="com.solacesystems.jms.property.JMSProperties"
+        c:environment-ref="jmsEnvironment" />
+    <util:map id="jmsEnvironment" map-class="java.util.Hashtable" />
+
+</beans>

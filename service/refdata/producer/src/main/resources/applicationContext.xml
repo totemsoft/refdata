@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:c="http://www.springframework.org/schema/c"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xmlns:util="http://www.springframework.org/schema/util"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- ========================= COMMON ========================= -->
+    <util:constant id="TRUE"  static-field="java.lang.Boolean.TRUE" />
+    <util:constant id="FALSE" static-field="java.lang.Boolean.FALSE" />
+
+    <!-- ========================= JASYPT ========================= -->
+    <import resource="classpath:au/net/apollosoft/refdata/commons/spring-inc-jasypt.xml" />
+
+    <!-- ========================= JMS ========================= -->
+    <import resource="classpath:au/net/apollosoft/refdata/commons/spring-inc-jms.xml" />
+
+    <!-- ========================= CAMEL ========================= -->
+    <import resource="classpath:au/net/apollosoft/refdata/refdata/producer/spring-inc-camel.xml" />
+
+    <!-- ========================= DAO ========================= -->
+    <bean id="producerDao" class="au.net.apollosoft.refdata.refdata.producer.dao.impl.ProducerDaoImpl" />
+
+    <!-- ========================= SERVICE ========================= -->
+    <bean id="producerService" class="au.net.apollosoft.refdata.refdata.producer.impl.ProducerServiceImpl" />
+
+    <!-- ========================= JAXB ========================= -->
+    <util:constant id="JAXB_FRAGMENT" static-field="javax.xml.bind.Marshaller.JAXB_FRAGMENT" />
+    <util:constant id="JAXB_FORMATTED_OUTPUT" static-field="javax.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT" />
+    <util:constant id="IS_NAMESPACE_AWARE" static-field="javax.xml.stream.XMLInputFactory.IS_NAMESPACE_AWARE" />
+
+    <bean id="marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
+        <property name="classesToBeBound">
+            <list>
+                <value>au.net.apollosoft.v1.CanonMessage</value>
+                <value>au.net.apollosoft.refdata.v1.Content</value>
+            </list>
+        </property>
+        <property name="marshallerProperties">
+            <map>
+                <entry key-ref="JAXB_FORMATTED_OUTPUT" value-ref="FALSE" />
+            </map>
+        </property>
+    </bean>
+
+    <!-- =======================================================================
+        Task(s) Schedule
+        https://docs.oracle.com/cd/E12058_01/doc/doc.1014/e12030/cron_expressions.htm
+    ======================================================================== -->
+    <task:executor id="executor" />
+    <task:scheduler id="scheduler" />
+    <task:annotation-driven executor="executor" scheduler="scheduler" />
+    <bean id="producerTask" class="au.net.apollosoft.refdata.refdata.producer.impl.ProducerTaskImpl" />
+
+</beans>
