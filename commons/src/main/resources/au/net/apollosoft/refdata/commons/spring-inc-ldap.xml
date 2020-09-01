@@ -9,9 +9,9 @@
            http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <bean id="ldapContextSource" class="org.springframework.ldap.core.support.LdapContextSource"
-        p:url      = "#{ldap.url}"
-        p:userDn   = "cn=#{ldap.username},#{ldap.baseName}"
-        p:password = "#{ldap.password}"
+        p:url      = "#{systemProperties['LDAP_URL']}"
+        p:userDn   = "cn=#{systemProperties['LDAP_USERNAME']},#{systemProperties['LDAP_BASENAME']}"
+        p:password = "#{systemProperties['LDAP_PASSWORD']}"
         p:pooled   = "true"
     />
 
